@@ -68,3 +68,21 @@ def log_test(request):
 
     else:
         log.info(f'========== TEST {test_name} SKIPPED in {test_run_time} seconds ==========')
+
+
+@pytest.fixture()
+def set_testcase_name(request, record_xml_attribute):
+    """fixture to change the xml report's testcase name field
+
+    - Related pytest documentation: https://docs.pytest.org/en/7.1.x/how-to/output.html#record-xml-attribute
+    - Warning (from docs): Please note that using this feature *may* break schema verifications for the latest
+    JUnitXML schema. This might be a problem when used with some CI servers.
+    """
+
+    def record_testcase_name(testcase_name=None):
+        if not testcase_name:
+            testcase_name = f"{request.node.name}_{request.cls.api.fs_type}"
+        log.info(f"recording testcase name: {testcase_name}")
+        record_xml_attribute("name", testcase_name)
+
+    return record_testcase_name
