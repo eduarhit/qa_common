@@ -1,0 +1,9 @@
+{
+  "clusters": [],
+  "arti_token": "xxxxxxxxxx",
+  "practitest_token": "xxxxxx",
+  "practitest_author_id": "xxxx",
+  "esxi_hostname": "uk-vcenter.terastack.bluearc.com",
+  "esxi_username": "xxxxx",
+  "esxi_password": "xxxxx"
+}
