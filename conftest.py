@@ -7,10 +7,10 @@ import time
 import sys
 import json
 import pytest
-from utils import collect_diags
+
 if not os.path.abspath(os.path.dirname(__file__)) in sys.path:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
+from utils import collect_diags
 
 pytest.context = {}
 
