@@ -1,7 +1,7 @@
 """  General util functions for the test framework """
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-arguments,duplicate-code
-
+# pylint: disable-all
 import datetime
 import logging as log
 import os
