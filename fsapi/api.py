@@ -43,7 +43,7 @@ class FsApiWrapper:
         elif self.fs_type == "ufo":
             # Append to python path the folder containing the pybind .so library compiled
             sys.path.append(f"{root_code_path}/bazel-bin/src")
-            import libufopybind as fsapi
+            import libufonanobind as fsapi
 
         # This is to be able to access fsapi lib
         self.fsapi = fsapi
