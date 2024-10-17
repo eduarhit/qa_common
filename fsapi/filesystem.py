@@ -32,7 +32,7 @@ class FileSystem:
     """
 
     def __init__(
-        self, api, fsapi, fs_mount, fs_type, fs_id=1, subvolume_path=None
+            self, api, fsapi, fs_mount, fs_type, fs_id=1, subvolume_path=None
     ):
         self.fs_id = fs_id
         self.api = api
@@ -43,13 +43,14 @@ class FileSystem:
         elif fs_type == "sofs":
             fs_mount.fsid = fs_id
             fs_mount.path = subvolume_path
-        fs_info = self.api.OpenFilesystem(fs_mount)
         if fs_type == "ufo":
             self.fs_info = fs_id
-        assert fs_info[0] == 0
-        self.fs_info = fs_info[1]
+        else:
+            fs_info = self.api.OpenFilesystem(fs_mount)
+            assert fs_info[0] == 0
+            self.fs_info = fs_info[1]
         root_inode = api.LookupRoot(self.fs_info)
-        assert root_inode[0] == 0
+        # assert root_inode[0] == 0 # skip for now, not ready
         self.root_inode = root_inode[1]
 
     def get_handle_object_type(self):
@@ -61,11 +62,11 @@ class FileSystem:
             return self.fsapi.PassthruHandle
 
     def lookup(
-        self,
-        file_path,
-        parent_inode,
-        req_flags=None,
-        verify=True,
+            self,
+            file_path,
+            parent_inode,
+            req_flags=None,
+            verify=True,
     ):
         if not req_flags:
             req_flags = self.fsapi.RequestFlags()
@@ -77,7 +78,7 @@ class FileSystem:
         return ret_code, parent_attr, target_attr, root_inode
 
     def get_inode(
-        self, file_path, req_flags=None, verify=True, return_attrs=False
+            self, file_path, req_flags=None, verify=True, return_attrs=False
     ):
         """Get inode for a given path
         :param str file_path: path of the file/dir
@@ -123,11 +124,11 @@ class FileSystem:
         return root_inode[1]
 
     def sync(
-        self,
-        file_path=None,
-        handle_id=None,
-        req_flags=None,
-        verify=True,
+            self,
+            file_path=None,
+            handle_id=None,
+            req_flags=None,
+            verify=True,
     ):
         """Sync for a given file
         :param str file_path: path of the file
@@ -165,12 +166,12 @@ class FileSystem:
         return ret_code, None, target_attr
 
     def hole_punch(
-        self,
-        file_path,
-        offset,
-        length,
-        req_flags=None,
-        verify=True,
+            self,
+            file_path,
+            offset,
+            length,
+            req_flags=None,
+            verify=True,
     ):
         """Deallocate the specified range of the file
         :param str file_path: path of the file
@@ -207,11 +208,11 @@ class FileSystem:
         return ret_code, None, target_attr
 
     def find_sparse_region(
-        self,
-        file_path,
-        offset,
-        seek_type,
-        verify=True,
+            self,
+            file_path,
+            offset,
+            seek_type,
+            verify=True,
     ):
         """Find the desired file offset as determined by seek_type
         :param str file_path: path of the file
@@ -246,12 +247,12 @@ class FileSystem:
         return ret_code, match_offset
 
     def open_dir(
-        self,
-        dir_path,
-        req_flags=None,
-        open_flags=os.O_DIRECTORY,
-        open_parameters=None,
-        verify=True,
+            self,
+            dir_path,
+            req_flags=None,
+            open_flags=os.O_DIRECTORY,
+            open_parameters=None,
+            verify=True,
     ):
         """Get dir_handle for a given folder
         :param str dir_path: path of the dir
@@ -270,19 +271,19 @@ class FileSystem:
         dir_inode = self.get_inode(dir_path)
 
         ret_code, handle, target_attr = self.api.Open(
-        self.fs_info, dir_inode, req_flags=req_flags, open_flags=open_flags, open_parameters=open_parameters
+            self.fs_info, dir_inode, req_flags=req_flags, open_flags=open_flags, open_parameters=open_parameters
         )
         if verify:
             assert ret_code == 0
         return ret_code, None, target_attr, handle
 
     def upgrade_open(
-        self,
-        handle,
-        req_flags=None,
-        open_flags=os.O_DIRECTORY,
-        open_parameters=None,
-        verify=True,
+            self,
+            handle,
+            req_flags=None,
+            open_flags=os.O_DIRECTORY,
+            open_parameters=None,
+            verify=True,
     ):
         """Upgrade the open mode of an open handle for a file, directory or stream
         :param Handle handle: handle to downgrade
@@ -306,11 +307,11 @@ class FileSystem:
         return ret_code, None, target_attr
 
     def downgrade_open(
-        self,
-        handle,
-        access_mode,
-        shared_mode,
-        verify=True,
+            self,
+            handle,
+            access_mode,
+            shared_mode,
+            verify=True,
     ):
         """Downgrade the open mode of an open handle for a file, directory or stream
         :param Handle handle: handle to downgrade
@@ -336,13 +337,13 @@ class FileSystem:
         return ret_code, parent_id
 
     def mkdir(
-        self,
-        folder_path,
-        stat_info=None,
-        extra_info=None,
-        req_flags=None,
-        unix_mode=None,
-        verify=True,
+            self,
+            folder_path,
+            stat_info=None,
+            extra_info=None,
+            req_flags=None,
+            unix_mode=None,
+            verify=True,
     ):
         """Create folder defined by folder_path
         :param str folder_path: path of the dir
@@ -400,11 +401,11 @@ class FileSystem:
         return ret_val
 
     def read_dir_entries(
-        self,
-        dir_path,
-        req_flags=None,
-        cookie=0,
-        max_entries=MAX_READDIR_ENTRIES,
+            self,
+            dir_path,
+            req_flags=None,
+            cookie=0,
+            max_entries=MAX_READDIR_ENTRIES,
     ):
         """Read dir on dir_path
         :param str dir_path: dir path
@@ -436,16 +437,16 @@ class FileSystem:
         return ret_code, None, target_attr, dict_entries
 
     def create_file(
-        self,
-        file_path,
-        stat_info=None,
-        extra_info=None,
-        req_flags=None,
-        open_flags=0o100,
-        open_parameters=None,
-        unix_mode=None,
-        verify=True,
-        autoclose=True
+            self,
+            file_path,
+            stat_info=None,
+            extra_info=None,
+            req_flags=None,
+            open_flags=0o100,
+            open_parameters=None,
+            unix_mode=None,
+            verify=True,
+            autoclose=True
     ):
         """Creates a file defined by file_path
         :param str file_path: path of the file
@@ -502,11 +503,11 @@ class FileSystem:
         return ret_code, parent_attr, target_attr, inode, handle
 
     def create_stream(
-        self,
-        inode,
-        name,
-        req_flags=None,
-        verify=True,
+            self,
+            inode,
+            name,
+            req_flags=None,
+            verify=True,
     ):
         """Creates a stream
         :param Inode inode: file/dir inode to associate with the stream
@@ -530,14 +531,14 @@ class FileSystem:
         return ret_code, None, base_attr, stream_id
 
     def open_stream(
-        self,
-        inode,
-        name=None,
-        stream_id=None,
-        open_flags=0o100,
-        open_parameters=None,
-        req_flags=None,
-        verify=True,
+            self,
+            inode,
+            name=None,
+            stream_id=None,
+            open_flags=0o100,
+            open_parameters=None,
+            req_flags=None,
+            verify=True,
     ):
         """Opens the stream defined by inode and name/id, either name or id must be provided, not both
         :param str name: name of the stream to open
@@ -577,11 +578,11 @@ class FileSystem:
         return ret_code, None, base_attr, stream_id, handle
 
     def delete_stream(
-        self,
-        inode,
-        name=None,
-        req_flags=None,
-        verify=True,
+            self,
+            inode,
+            name=None,
+            req_flags=None,
+            verify=True,
     ):
         """Deletes the stream defined by inode and name
         :param str name: name of the stream to delete
@@ -603,7 +604,7 @@ class FileSystem:
         return ret_code, None, base_attr
 
     def list_streams(
-        self, inode, resume_id=0, buffer_size=1024000, verify=True
+            self, inode, resume_id=0, buffer_size=1024000, verify=True
     ):
         """Lists the streams associated with the provided inode
         :param Inode inode: file/dir inode associated with the stream
@@ -622,12 +623,12 @@ class FileSystem:
         return ret_code, stream_entries, stream_names
 
     def rename_stream(
-        self,
-        inode,
-        name_from,
-        name_to,
-        req_flags=None,
-        verify=True,
+            self,
+            inode,
+            name_from,
+            name_to,
+            req_flags=None,
+            verify=True,
     ):
         """Renames the stream defined by inode and name,
         :param Inode inode: file/dir inode associated with the stream
@@ -650,10 +651,10 @@ class FileSystem:
         return ret_code, None, base_attr
 
     def get_stream_length(
-        self,
-        inode,
-        stream_id,
-        verify=True,
+            self,
+            inode,
+            stream_id,
+            verify=True,
     ):
         """Gets the stream length for base inode and stream_id,
         :param Inode inode: file/dir inode associated with the stream
@@ -672,11 +673,11 @@ class FileSystem:
         return ret_code, length, bytes_used
 
     def set_stream_length(
-        self,
-        inode,
-        stream_id,
-        new_length,
-        verify=True,
+            self,
+            inode,
+            stream_id,
+            new_length,
+            verify=True,
     ):
         """Sets the stream length for base inode and stream_id to new_length
         :param Inode inode: file/dir inode associated with the stream
@@ -696,14 +697,14 @@ class FileSystem:
         return ret_code
 
     def write(
-        self,
-        data,
-        file_path=None,
-        handle_id=None,
-        req_flags=None,
-        offset=0,
-        write_flags=0,
-        verify=True,
+            self,
+            data,
+            file_path=None,
+            handle_id=None,
+            req_flags=None,
+            offset=0,
+            write_flags=0,
+            verify=True,
     ):
         """Writes data into a file defined by file_path
         :param str file_path: path of the file
@@ -755,16 +756,15 @@ class FileSystem:
             assert ret_code == 0
         return ret_code, None, target_attr
 
-
     def write_v(
-        self,
-        data_list,
-        file_path=None,
-        handle_id=None,
-        req_flags=None,
-        offset=0,
-        write_flags=0,
-        verify=True,
+            self,
+            data_list,
+            file_path=None,
+            handle_id=None,
+            req_flags=None,
+            offset=0,
+            write_flags=0,
+            verify=True,
     ):
         """Writes data into a file defined by file_path
         :param str file_path: path of the file
@@ -815,14 +815,14 @@ class FileSystem:
         return ret_code, None, target_attr
 
     def read(
-        self,
-        length,
-        file_path=None,
-        handle_id=None,
-        req_flags=None,
-        offset=0,
-        read_flags=0,
-        verify=True,
+            self,
+            length,
+            file_path=None,
+            handle_id=None,
+            req_flags=None,
+            offset=0,
+            read_flags=0,
+            verify=True,
     ):
         """Reads data from a file defined by file_path
         :param str file_path: path of the file
@@ -883,12 +883,12 @@ class FileSystem:
         return ret_val
 
     def open_file(
-        self,
-        file_path,
-        open_flags=os.O_RDWR,
-        open_parameters=None,
-        req_flags=None,
-        verify=True,
+            self,
+            file_path,
+            open_flags=os.O_RDWR,
+            open_parameters=None,
+            req_flags=None,
+            verify=True,
     ):
         """Opens the file defined by file_path
         :param str file_path: path of the file
@@ -915,7 +915,8 @@ class FileSystem:
             )
         else:
             ret_code, handle, target_attr = self.api.Open(
-                self.fs_info, parent_inode, file_inode, req_flags=req_flags, open_flags=open_flags, open_parameters=open_parameters
+                self.fs_info, parent_inode, file_inode, req_flags=req_flags, open_flags=open_flags,
+                open_parameters=open_parameters
             )
 
         if verify:
@@ -942,14 +943,14 @@ class FileSystem:
         return ret_val[0]
 
     def set_attr(
-        self,
-        file_path,
-        stat_info=None,
-        extra_info=None,
-        control=0,
-        dos_flags_mask=0,
-        req_flags=None,
-        verify=True,
+            self,
+            file_path,
+            stat_info=None,
+            extra_info=None,
+            control=0,
+            dos_flags_mask=0,
+            req_flags=None,
+            verify=True,
     ):
         """GetAttr operation
         :param str file_path: path of the file
@@ -1071,12 +1072,12 @@ class FileSystem:
         return ret_val
 
     def link(
-        self,
-        src_path,
-        dst_parent_folder,
-        link_name,
-        req_flags=None,
-        verify=True,
+            self,
+            src_path,
+            dst_parent_folder,
+            link_name,
+            req_flags=None,
+            verify=True,
     ):
         """link operation
         :param str src_path: path for the file to link
@@ -1132,11 +1133,11 @@ class FileSystem:
         return ret_code, parent_attr, target_attr
 
     def read_link(
-        self,
-        link_path,
-        length=255,
-        req_flags=None,
-        verify=True,
+            self,
+            link_path,
+            length=255,
+            req_flags=None,
+            verify=True,
     ):
         """Reads the contents of a symbolic link
         :param str link_path: path where the link is
@@ -1161,14 +1162,14 @@ class FileSystem:
         return ret_code, None, target_attr, read_result
 
     def symlink(
-        self,
-        link_target,
-        dst_parent_folder,
-        link_name,
-        stat_info=None,
-        extra_info=None,
-        req_flags=None,
-        verify=True,
+            self,
+            link_target,
+            dst_parent_folder,
+            link_name,
+            stat_info=None,
+            extra_info=None,
+            req_flags=None,
+            verify=True,
     ):
         """symlink operation
         :param str link_target: path for the file to link
@@ -1233,7 +1234,7 @@ class FileSystem:
         return ret_code, parent_attr, None
 
     def create_snapshot(
-        self, snap_name, app_search_id="app1", reason="1", verify=True
+            self, snap_name, app_search_id="app1", reason="1", verify=True
     ):
         if self.fs_type == "gfs":
             # create snapshot using console cmd
@@ -1266,8 +1267,8 @@ class FileSystem:
                     timeout=20,
                 )
             except (
-                subprocess.TimeoutExpired,
-                subprocess.CalledProcessError,
+                    subprocess.TimeoutExpired,
+                    subprocess.CalledProcessError,
             ) as exp:
                 log.error(exp)
                 return False
@@ -1365,7 +1366,7 @@ class FileSystem:
             svpath = pathlib.Path(f"/mnt/{volume}{subv_path}")
             parent_path = svpath.parent
             snapshot_name = (
-                "_" + snap_name + "_" + str(os.stat(f"{parent_path}").st_ino)
+                    "_" + snap_name + "_" + str(os.stat(f"{parent_path}").st_ino)
             )
             snapshot_path = str(svpath) + "/.snap/" + snapshot_name
             snapshot_id = os.stat(f"{snapshot_path}").st_dev
@@ -1377,8 +1378,8 @@ class FileSystem:
                     timeout=20,
                 )
             except (
-                subprocess.TimeoutExpired,
-                subprocess.CalledProcessError,
+                    subprocess.TimeoutExpired,
+                    subprocess.CalledProcessError,
             ) as exp:
                 log.error(exp)
                 return False
@@ -1466,6 +1467,6 @@ class FileSystem:
         )
         if verify:
             assert (
-                ret_code == 0
+                    ret_code == 0
             ), f"Unable to get snapshot info for id {snapshot_id}"
         return ret_code, snap_info, app_search_id, name

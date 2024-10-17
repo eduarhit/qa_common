@@ -77,6 +77,8 @@ class FsApiWrapper:
             fs_mount = self.fsapi.SofsMountInfo()
         elif self.fs_type == "fsapi":
             fs_mount = self.fsapi.PassthruMountInfo()
+        elif self.fs_type == "ufo":
+            fs_mount = "No mount"
         else:
             raise AssertionError(f"type {self.fs_type} not recognized")
         return FileSystem(
