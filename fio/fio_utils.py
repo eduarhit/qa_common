@@ -20,7 +20,7 @@ def parse_fio_config(config):
 
 def run_fio(fio_config, job_file):
     """
-    Run fio with the given config and job file
+    Run fio tool with the given config and job file
     """
     log.info("Parsing fio options")
     fio_config = parse_fio_config(fio_config)
