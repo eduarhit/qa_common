@@ -750,12 +750,13 @@ def get_cookie_with_name(driver, cookie_name):
         print(cookie_entry)
 
 
-def execute_bash_script(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+def run_shell_command(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                         universal_newlines=True, check=False, timeout=None, shell=False):
-    """ This function will run a bash script
+    """ This function will run a shell command
     :param cmd: list of cmd arguments
     :return: retval object of subprocess run
     """
+    cmd = [c for c in cmd.split(' ')]
     return subprocess.run(
         cmd,
         stdout=stdout,
