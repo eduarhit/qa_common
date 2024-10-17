@@ -32,7 +32,7 @@ class FileSystem:
     """
 
     def __init__(
-        self, api, fsapi, fs_mount, fs_type, fs_id=None, subvolume_path=None
+        self, api, fsapi, fs_mount, fs_type, fs_id=1, subvolume_path=None
     ):
         self.fs_id = fs_id
         self.api = api
@@ -44,6 +44,8 @@ class FileSystem:
             fs_mount.fsid = fs_id
             fs_mount.path = subvolume_path
         fs_info = self.api.OpenFilesystem(fs_mount)
+        if fs_type == "ufo":
+            self.fs_info = fs_id
         assert fs_info[0] == 0
         self.fs_info = fs_info[1]
         root_inode = api.LookupRoot(self.fs_info)
@@ -904,12 +906,18 @@ class FileSystem:
             open_parameters.access_mode = AccessModes.READ | AccessModes.WRITE | AccessModes.DELETE
             open_parameters.share_mode = AccessModes.READ | AccessModes.WRITE | AccessModes.DELETE
         file_inode = self.get_inode(file_path)
+        parent_inode = self.get_inode(os.path.split(file_path)[0])
         if not isinstance(file_inode, self.fsapi.Inode):
             return file_inode
+        if self.fs_type != "ufo":
+            ret_code, handle, target_attr = self.api.Open(
+                self.fs_info, file_inode, req_flags=req_flags, open_flags=open_flags, open_parameters=open_parameters
+            )
+        else:
+            ret_code, handle, target_attr = self.api.Open(
+                self.fs_info, parent_inode, file_inode, req_flags=req_flags, open_flags=open_flags, open_parameters=open_parameters
+            )
 
-        ret_code, handle, target_attr = self.api.Open(
-            self.fs_info, file_inode, req_flags=req_flags, open_flags=open_flags, open_parameters=open_parameters
-        )
         if verify:
             assert ret_code == 0
         return ret_code, None, target_attr, handle
@@ -921,9 +929,13 @@ class FileSystem:
         Returns get_attr result if everything ok, error otherwise
         """
         file_inode = self.get_inode(file_path, verify=verify)
+        parent_inode = self.get_inode(os.path.split(file_path)[0], verify=verify)
         if not isinstance(file_inode, self.fsapi.Inode):
             return file_inode
-        ret_val = self.api.GetAttr(self.fs_info, file_inode)
+        if self.fs_type != "ufo":
+            ret_val = self.api.GetAttr(self.fs_info, file_inode)
+        else:
+            ret_val = self.api.GetAttr(self.fs_info, parent_inode, file_inode)
         if verify:
             assert ret_val[0] == 0
             return ret_val[1:]
@@ -951,17 +963,31 @@ class FileSystem:
         if not req_flags:
             req_flags = self.fsapi.RequestFlags()
         file_inode = self.get_inode(file_path, verify=verify)
+        parent_inode = self.get_inode(os.path.split(file_path)[0], verify=verify)
         if not isinstance(file_inode, self.fsapi.Inode):
             return file_inode
-        ret_code, target_attr = self.api.SetAttr(
-            self.fs_info,
-            file_inode,
-            stat_info,
-            extra_info,
-            control,
-            dos_flags_mask,
-            req_flags,
-        )
+        if self.fs_type != "ufo":
+            ret_code, target_attr = self.api.SetAttr(
+                self.fs_info,
+                file_inode,
+                stat_info,
+                extra_info,
+                control,
+                dos_flags_mask,
+                req_flags,
+            )
+        else:
+            ret_code, target_attr = self.api.SetAttr(
+                self.fs_info,
+                parent_inode,
+                file_inode,
+                stat_info,
+                extra_info,
+                control,
+                dos_flags_mask,
+                req_flags,
+            )
+
         if verify:
             assert ret_code == 0, f"code returned is {ret_code}"
         return ret_code, target_attr
