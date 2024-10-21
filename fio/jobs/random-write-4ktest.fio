@@ -1,0 +1,11 @@
+[random-write]
+rw=randwrite
+filename=/tmp
+size=10G
+direct=1
+numjobs=1
+group_reporting
+name=random-write
+bs=4k
+runtime=10
+ioengine=io_uring

@@ -1,6 +1,6 @@
 [default_job]
-ioengine=libaio
-filename=/tmp/file3
+ioengine=io_uring
+filename=/tmp
 rw=rw
 bs=64M
 size=128M

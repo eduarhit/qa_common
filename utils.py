@@ -949,4 +949,18 @@ def collect_diags(test_name, clusters=None):
         for cluster in clusters:
             cluster.collect_diags(test_name)
 
+def formatter(numeric_val, unit_defs):
+    """Format a number based on unit definitions."""
+    for unit, factor in unit_defs.items():
+        if numeric_val >= factor:
+            return numeric_val / factor, unit
+    return numeric_val, "ns"
 
+def format_units_time(nanosecs):
+    """format a number of seconds in s/ms/us/ns"""
+    val, units = formatter(nanosecs, {"s": 1000 ** 3, "ms": 1000 ** 2, "us": 1000, "ns": 0})
+    return "%d %s" % (int(val), units)
+
+def format_units_iops(iops):
+    """format a number of iops"""
+    return f"{int(iops):,}"

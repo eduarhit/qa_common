@@ -1,0 +1,11 @@
+[sequential-write]
+rw=write
+filename=/tmp
+size=10G
+direct=1
+numjobs=1
+group_reporting
+name=sequential-write
+bs=1M
+runtime=10
+ioengine=io_uring
