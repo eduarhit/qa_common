@@ -100,8 +100,8 @@ class FioResult_Parser:
                         fio_log_perf("total", metric, total)
                         fio_log_perf("average", metric, total / len(keys))
                     else:
-                        if self.summary["read"]["lat_ns"]["mean"] > 0.0 and self.summary["write"]["lat_ns"][
-                            "mean"] > 0.0:
+                        if (self.summary["read"]["lat_ns"]["mean"] > 0.0 and
+                                self.summary["write"]["lat_ns"]["mean"] > 0.0):
                             avg_latency = (self.summary["read"]["lat_ns"]["mean"] + self.summary["write"]["lat_ns"][
                                 "mean"]) / 2
                             fio_log_perf("average", metric, avg_latency)
